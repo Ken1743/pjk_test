@@ -15,16 +15,12 @@ jobs:
         with:
           node-version: 18
 
-      # Applicant のビルド
       - run: npm install && npm run build --prefix frontend/applicant
-
-      # Admin のビルド
       - run: npm install && npm run build --prefix frontend/admin
 
-      # Firebase CLI インストール
-      - run: npm install -g firebase-tools
-
-      # デプロイ
-      - run: firebase deploy --only hosting \
-          --project pjk-test-fcc32 \
-          --token "${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: pjk-test-fcc32
