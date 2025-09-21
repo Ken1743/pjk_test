@@ -11,22 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # 認証
+      # ここで認証する
       - id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # gcloud セットアップ
       - uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ringed-trail-472801-j4
 
-      # Artifact Registry に build & push
       - run: gcloud builds submit \
           --tag asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest backend/
 
-      # Cloud Run にデプロイ
       - run: gcloud run deploy backend \
           --image asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest \
           --region asia-northeast1 \
