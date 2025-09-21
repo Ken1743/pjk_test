@@ -12,7 +12,7 @@ Docker Compose で統一環境を構築し、本番は Cloud Run / Firebase Host
 - `infra/` : docker-compose, .env.example
 
 --
-.
+```
 ├── README.md
 ├── backend
 │   ├── Dockerfile
@@ -39,7 +39,7 @@ Docker Compose で統一環境を構築し、本番は Cloud Run / Firebase Host
 │   └── docker-compose.yml
 └── memo_ken.txt
 
-
+```
 
 ## 🚀 セットアップ
 
