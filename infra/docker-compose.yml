@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  backend:
+    build: ../backend
+    ports:
+      - "8080:8080"
+  applicant:
+    build: ../frontend/applicant
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://backend:8080
+  admin:
+    build: ../frontend/admin
+    ports:
+      - "3001:80"
+    environment:
+      - REACT_APP_API_URL=http://backend:8080

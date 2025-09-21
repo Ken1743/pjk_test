@@ -1,0 +1,144 @@
+# PJM System
+
+React (applicant/admin) + Flask (backend) のシステムです。  
+Docker + docker-compose でローカル開発環境を統一し、  
+本番は **Cloud Run (backend)** + **Firebase Hosting (frontend)** で運用します。
+
+---
+
+## 📂 ディレクトリ構成
+
+pjm-system/
+├── README.md
+├── backend/ # Flask API
+│ ├── Dockerfile
+│ ├── app.py
+│ └── requirements.txt
+├── frontend/
+│ ├── applicant/ # React (求職者向け)
+│ │ ├── Dockerfile
+│ │ ├── package.json
+│ │ ├── src/App.js
+│ │ └── ...
+│ └── admin/ # React (管理者向け)
+│ ├── Dockerfile
+│ ├── package.json
+│ ├── src/App.js
+│ └── ...
+├── infra/
+│ ├── docker-compose.yml
+│ └── .env.example
+└── .gitignore
+
+yaml
+---
+
+## 🚀 セットアップ手順
+
+### 1. リポジトリを clone
+```bash
+git clone https://github.com/xxx/pjm-system.git
+cd pjm-system
+2. 環境変数ファイルを用意
+.env は GitHub には含まれません。
+サンプルからコピーして作成してください：
+
+bash
+cp infra/.env.example infra/.env
+infra/.env.example の例:
+
+env
+REACT_APP_API_URL=http://backend:8080
+FLASK_ENV=development
+SECRET_KEY=change_me
+
+3. Docker 環境を起動
+bash
+cd infra
+docker compose up --build
+サービス一覧：
+Backend (Flask API) → http://localhost:8080/api/hello
+Applicant Frontend → http://localhost:3000
+Admin Frontend → http://localhost:3001
+
+4. Backend 単体での起動（デバッグ用）
+bash
+cd backend
+pip install -r requirements.txt
+flask run --host=0.0.0.0 --port=8080
+
+5. Frontend 単体での起動（デバッグ用）
+applicant
+bash
+cd frontend/applicant
+npm install
+npm start
+→ http://localhost:3000
+
+admin
+bash
+cd frontend/admin
+npm install
+npm start
+→ http://localhost:3001
+
+✅ 動作確認チェックリスト
+http://localhost:8080/api/hello にアクセスすると：
+
+json
+{"message": "Hello from Flask API!"}
+Applicant/Admin の画面に
+
+csharp
+Backend says: Hello from Flask API!
+と表示される
+
+🛑 .gitignore ポイント
+node_modules/ は Git に含めません
+
+各メンバーは npm install で再生成してください
+cd frontend/applicant
+npm install
+
+.env は Git に含めません
+
+代わりに .env.example をコミットし、各自コピーして使用
+
+📦 今後の運用
+開発: docker compose up で統一環境
+
+本番:
+
+Backend → Cloud Run (Docker image)
+
+Frontend → Firebase Hosting (サブドメイン分け: applicant/admin)
+
+CI/CD: GitHub Actions で自動デプロイ予定
+
+
+確認方法
+
+1. Docker イメージがビルドされるか
+bash
+cd infra
+docker compose build
+
+
+2. サービスが起動できるか
+docker compose up
+ログにエラーが出ていないこと
+
+backend-1, applicant-1, admin-1 が立ち上がっていること
+
+3. Backend API の動作確認
+ブラウザまたは curl で確認：
+curl http://localhost:8080/api/hello
+期待されるレスポンス：
+{"message":"Hello from Flask API!"}
+
+4. Applicant Frontend の確認
+http://localhost:3000
+ にアクセス
+表示内容：
+Applicant Frontend
+Backend says: Hello from Flask API!

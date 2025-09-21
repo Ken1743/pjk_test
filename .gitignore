@@ -1,0 +1,51 @@
+#Python → __pycache__, .pyc を除外
+#React → node_modules/, build/ を除外
+#Secrets → .env は除外、でも .env.example はコミット（チーム共有用）
+#Docker → ログファイルや開発用 override 設定を除外
+#IDE/OS → VSCode, IntelliJ, macOS 系のゴミファイルを除外
+
+
+# ========================
+# Python (Flask backend)
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+
+# Virtualenv
+.venv/
+venv/
+
+# ========================
+# Node.js (React frontend)
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+build/
+
+# ========================
+# Environment / secrets
+# ========================
+.env
+.env.*
+!.env.example
+
+# ========================
+# Docker
+# ========================
+*.log
+docker-compose.override.yml
+
+# ========================
+# IDE / Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+.DS_Store
