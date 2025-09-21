@@ -1,0 +1,14 @@
+{
+  "hosting": [
+    {
+      "target": "applicant",
+      "public": "frontend/applicant/build",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "target": "admin",
+      "public": "frontend/admin/build",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
+}

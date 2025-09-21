@@ -38,12 +38,9 @@ Docker Compose で統一環境を構築し、本番は Cloud Run / Firebase Host
 ├── infra
 │   └── docker-compose.yml
 └── memo_ken.txt
-
-
-
 ## 🚀 セットアップ
 
-### 1. 環境変数
+### 環境変数
 ```bash
 cp infra/.env.example infra/.env
 2. 起動

@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "pjk-test-fcc32"
+  },
+  "targets": {
+    "pjk-test-fcc32": {
+      "hosting": {
+        "admin": [
+          "pjk-admin"
+        ],
+        "applicant": [
+          "pjk-applicant"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
