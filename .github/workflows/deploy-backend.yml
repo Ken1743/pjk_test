@@ -3,26 +3,30 @@ name: Deploy Backend
 on:
   push:
     branches:
-      - main   # mainブランチにpushしたら実行
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # ソースコードを取得
       - uses: actions/checkout@v3
 
-      # gcloud CLI セットアップ
+      # 認証
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # gcloud セットアップ
       - uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ringed-trail-472801-j4
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      # DockerイメージをArtifact Registryにpush
+      # Artifact Registry に build & push
       - run: gcloud builds submit \
           --tag asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest backend/
 
-      # Cloud Runにデプロイ
+      # Cloud Run にデプロイ
       - run: gcloud run deploy backend \
           --image asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest \
           --region asia-northeast1 \

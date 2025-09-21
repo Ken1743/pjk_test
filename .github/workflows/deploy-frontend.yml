@@ -3,30 +3,28 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - main   # mainブランチにpushしたら実行
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # ソースコードを取得
       - uses: actions/checkout@v3
 
-      # Node.js セットアップ
       - uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Applicantフロントエンドのビルド
+      # Applicant のビルド
       - run: npm install && npm run build --prefix frontend/applicant
 
-      # Adminフロントエンドのビルド
+      # Admin のビルド
       - run: npm install && npm run build --prefix frontend/admin
 
-      # Firebase Hostingへデプロイ
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          channelId: live
-          projectId: pjk-test-fcc32
+      # Firebase CLI インストール
+      - run: npm install -g firebase-tools
+
+      # デプロイ
+      - run: firebase deploy --only hosting \
+          --project pjk-test-fcc32 \
+          --token "${{ secrets.FIREBASE_DEPLOY_TOKEN }}"
