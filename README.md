@@ -207,3 +207,133 @@ Backend (Cloud Run) と Frontend (Firebase Hosting) が接続済み
 applicant/admin それぞれが独自 URL で公開
 
 本番環境で利用可能な状態
+
+
+## 📄 CI/CD 自動デプロイ手順書 (GitHub Actions)
+🚀 構成
+
+Backend (Flask API) → Google Cloud Run
+
+Frontend (React applicant/admin) → Firebase Hosting
+
+自動化 → GitHub Actions + GitHub Secrets
+
+1. GitHub Actions のフォルダ構成
+
+GitHub が認識するのは以下の場所のみ：
+
+.github/workflows/
+
+
+👉 .github/workflow/ は無効なので注意。
+
+2. Backend (Cloud Run) 自動デプロイ
+2.1 Workflow ファイル作成
+
+.github/workflows/deploy-backend.yml
+
+name: Deploy Backend
+on:
+  push:
+    paths:
+      - 'backend/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ringed-trail-472801-j4
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - run: gcloud builds submit --tag asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest backend/
+
+      - run: gcloud run deploy backend \
+          --image asia-northeast1-docker.pkg.dev/ringed-trail-472801-j4/backend-repo/backend:latest \
+          --region asia-northeast1 \
+          --platform managed \
+          --allow-unauthenticated
+
+3. Frontend (Firebase Hosting) 自動デプロイ
+3.1 Workflow ファイル作成
+
+.github/workflows/deploy-frontend.yml
+
+name: Deploy Frontend
+on:
+  push:
+    paths:
+      - 'frontend/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install && npm run build --prefix frontend/applicant
+      - run: npm install && npm run build --prefix frontend/admin
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: pjk-test-fcc32
+
+4. GitHub Secrets の設定
+4.1 Cloud Run 用 (GCP)
+
+GCP Console → IAM & 管理 → サービスアカウント作成
+
+権限: Cloud Run Admin, Artifact Registry Admin, Cloud Build Editor
+
+JSON キーを生成
+
+GitHub → リポジトリ → Settings → Secrets and variables → Actions
+
+Name: GCP_SA_KEY
+
+Value: JSON ファイルの中身
+
+4.2 Firebase Hosting 用
+
+Firebase Console → プロジェクト設定 → サービスアカウント → 新しい秘密鍵を生成
+
+GitHub → Secrets に登録
+
+Name: FIREBASE_SERVICE_ACCOUNT
+
+Value: JSON ファイルの中身
+
+5. 有効化と確認
+5.1 ディレクトリ修正
+mv .github/workflow .github/workflows
+git add .github/workflows
+git commit -m "Fix GitHub Actions workflows"
+git push
+
+5.2 動作確認
+
+backend/app.py を編集（例: "Hello from Flask API!" → "Hello from Backend v2!"）
+
+git commit & push
+
+GitHub → Actions タブで Deploy Backend が走る
+
+Cloud Run の URL を叩くと "Hello from Backend v2!" に変わっている
+
+👉 Frontend 側も同様に、push すると Deploy Frontend が走って Firebase Hosting に反映される
+
+✅ まとめ
+
+.github/workflows/ に yml を置く
+
+Secrets (GCP_SA_KEY / FIREBASE_SERVICE_ACCOUNT) を GitHub に登録
+
+push すると GitHub Actions が自動で Cloud Run / Firebase Hosting にデプロイ
