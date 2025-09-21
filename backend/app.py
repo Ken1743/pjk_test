@@ -9,4 +9,4 @@ CORS(app, origins=[
 
 @app.route("/api/hello")
 def hello():
-    return {"message": "Hello from Flask API!"}
+    return {"message": "Hello from backend v2!"}
